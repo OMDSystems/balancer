@@ -14,11 +14,13 @@ MonitorFoo =
     res.end()
 
   handleStatusReport: (req, res) ->
-    console.log(req.params)
-    unless serverStatus[req.body.server]
-      this.serverStatus[req.body.server](new ServerStatus(req.body.status))
-    res.writeHead(200)
-    res.end()
-
+    data = ''
+    req.on 'data', (chunk) ->
+      data += chunk
+    req.on 'end', () ->
+      status = JSON.parse(data)
+      serverStatus[status.host] = status.data
+      res.writeHead(200)
+      res.end()
 
 module.exports = MonitorFoo
