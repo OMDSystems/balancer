@@ -1,0 +1,11 @@
+{
+  "servers" : [
+    {
+      "url" : "localhost",
+      "port" : 9000
+    }, {
+      "url" : "localhost",
+      "port" : 9001
+    }
+  ]
+}
