@@ -1,2 +1,19 @@
-h1= title
-p Welcome to #{title}
+table
+  tr
+    th Host
+    th CPUs
+    th Load
+    th Memory free/total
+    th Status
+  - for(var server in status)
+    tr
+      td
+        b= server
+      td= status[server].cpucount
+      td= (100 * status[server].loadavg[0] / status[server].cpucount).toFixed(2) + "%"
+      td= status[server].freemem + "/" + status[server].totalmem
+      td
+        - if(status[server].lastseen < Date.now() - 4000)
+          div(class="offline")
+        - else
+          div(class="online")

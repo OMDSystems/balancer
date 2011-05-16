@@ -1,0 +1,19 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;}
+
+a {
+  color: #00B7FF;}
+
+th {
+  text-align: left;}
+
+div.online {
+  width: 12px;
+  height: 12px;
+  background: #00FF00;}
+
+div.offline {
+  width: 12px;
+  height: 12px;
+  background: #FF0000;}
