@@ -7,29 +7,35 @@ class Balancer extends http.Server
     super(this.requestHandler)
 
   requestHandler: (req, res) ->
-    proxy_request = this.nextServer().request(req.method, req.url, req.headers)
-    proxy_request.addListener 'response', (proxy_res) ->
-      proxy_res.addListener 'data', (chunk) -> res.write chunk, 'binary'
+    server = this.nextServer()
+    if server != null
+      proxy_request = server.request(req.method, req.url, req.headers)
+      proxy_request.addListener 'response', (proxy_res) ->
+        proxy_res.addListener 'data', (chunk) -> res.write chunk, 'binary'
 
-      proxy_res.addListener 'end', -> res.end()
+        proxy_res.addListener 'end', -> res.end()
 
-      res.writeHead proxy_res.statusCode
+        res.writeHead proxy_res.statusCode
 
-    req.addListener 'data', (chunk) -> proxy_request.write(chunk)
+      req.addListener 'data', (chunk) -> proxy_request.write(chunk)
 
-    req.addListener 'end', -> proxy_request.end()
+      req.addListener 'end', -> proxy_request.end()
+    else
+      res.writeHead 500
+      res.end()
 
   nextServer: ->
-    console.log(@monitor)
-    console.log(@monitor.serverStatus())
     servers = @monitor.serverStatus()
     server = null
     for s of servers
       if(server == null)
         server = servers[s]
-      else if(servers[s].loadavg[0] < server.loadavg[0])
+      else if(servers[s].loadavg[0] < server.loadavg[0] && servers[s].lastseen < Date.now() - 4000)
         server = servers[s]
-    console.log("choose: " + server.host)
-    http.createClient(server.port, server.host)
+    if server != null
+      console.log("choose: " + server.host)
+      http.createClient(server.port, server.host)
+    else
+      null
 
 module.exports = Balancer
