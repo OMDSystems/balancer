@@ -1,9 +1,9 @@
 http = require('http');
 
 class Balancer extends http.Server
-  constructor: (servers) ->
-    @servers = (http.createClient(server.port, server.url) for server in servers)
-    @counter = 0
+  constructor: (monitor) ->
+    #@servers = (http.createClient(server.port, server.url) for server in servers)
+    @monitor = monitor
     super(this.requestHandler)
 
   requestHandler: (req, res) ->
@@ -20,8 +20,16 @@ class Balancer extends http.Server
     req.addListener 'end', -> proxy_request.end()
 
   nextServer: ->
-    server = @servers[@counter]
-    @counter = (@counter+1)%2
-    server
+    console.log(@monitor)
+    console.log(@monitor.serverStatus())
+    servers = @monitor.serverStatus()
+    server = null
+    for s of servers
+      if(server == null)
+        server = servers[s]
+      else if(servers[s].loadavg[0] < server.loadavg[0])
+        server = servers[s]
+    console.log("choose: " + server.host)
+    http.createClient(server.port, server.host)
 
 module.exports = Balancer

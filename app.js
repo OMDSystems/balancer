@@ -10,7 +10,7 @@ var Balancer = require('./lib/balancer');
 var monitor = require('./lib/monitor')
 
 var config = JSON.parse(fs.readFileSync('./config/config.json', 'utf8'));
-var balancer = new Balancer(config.servers);
+var balancer = new Balancer(monitor);
 balancer.listen(8080);
 
 

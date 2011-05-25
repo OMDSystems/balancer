@@ -9,6 +9,8 @@ MonitorFoo =
     monitor.get '/', this.handleStatusRequest
     monitor
 
+  serverStatus: () -> serverStatus
+
   handleStatusRequest: (req, res) ->
     res.render('index', {
       title: 'foo',
@@ -20,9 +22,10 @@ MonitorFoo =
     req.on 'data', (chunk) ->
       data += chunk
     req.on 'end', () ->
-      status = JSON.parse(data);
-      status.data.lastseen = Date.now();
-      serverStatus[status.host] = status.data;
+      console.log("got status")
+      status = JSON.parse(data)
+      status.lastseen = Date.now()
+      serverStatus[status.host] = status
       res.writeHead(200)
       res.end()
 
